@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cash Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .register {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 500px; /* Set a max width for larger screens */
+            width: 100%; /* Ensure it uses full width on smaller screens */
+            box-sizing: border-box;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 1.5em; /* Responsive font size */
+        }
+
+        .item, .payment {
+            margin-bottom: 20px;
+        }
+
+        input[type="number"], input[type="text"], select {
+            width: 100%;
+            padding: 10px; /* Slightly larger padding for better touch interaction */
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box; /* Ensure padding is included in width */
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 1em; /* Responsive font size */
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .total, .payment, .itemDetails {
+            margin-top: 20px;
+        }
+
+        .itemDetails {
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+
+        .itemDetails p {
+            margin: 0;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.2em; /* Adjust font size for smaller screens */
+            }
+
+            button {
+                padding: 8px 12px; /* Adjust button size for smaller screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register">
+        <h1>Cash Register</h1>
+        <form id="registerForm">
+            <div class="item">
+                <label for="productCode">Product Code:</label>
+                <input type="text" id="productCode" placeholder="Enter product code" required>
+            </div>
+            <div class="item">
+                <label for="itemQuantity">Quantity:</label>
+                <input type="number" id="itemQuantity" min="1" required>
+            </div>
+            <button type="button" onclick="addItem()">Add Item</button>
+        </form>
+        <div class="itemDetails" id="itemDetails">
+            <!-- Item details will be displayed here -->
+        </div>
+        <div class="total">
+            <h2>Total: ₱<span id="totalAmount">0.00</span></h2>
+        </div>
+        <div class="payment">
+            <label for="paymentAmount">Payment Amount (₱):</label>
+            <input type="number" id="paymentAmount" step="0.01" min="0" required>
+            <button type="button" onclick="calculateChange()">Calculate Change</button>
+            <h2>Change: ₱<span id="changeAmount">0.00</span></h2>
+        </div>
+    </div>
+    <script>
+        // Fruit data
+        const fruits = [
+            { code: 'A01', name: 'Apple', price: 30 },
+            { code: 'B02', name: 'Banana', price: 15 },
+            { code: 'O03', name: 'Orange', price: 25 },
+            { code: 'G04', name: 'Grapes', price: 45 },
+            { code: 'M05', name: 'Mango', price: 40 },
+            { code: 'P06', name: 'Pineapple', price: 35 },
+            { code: 'S07', name: 'Strawberry', price: 50 },
+            { code: 'W08', name: 'Watermelon', price: 20 }
+        ];
+
+        let totalAmount = 0;
+
+        function addItem() {
+            const productCode = document.getElementById('productCode').value.trim().toUpperCase();
+            const itemQuantity = parseInt(document.getElementById('itemQuantity').value);
+            
+            if (!productCode || isNaN(itemQuantity) || itemQuantity <= 0) {
+                alert('Please enter a valid product code and quantity.');
+                return;
+            }
+
+            // Find selected fruit
+            const selectedFruit = fruits.find(fruit => fruit.code === productCode);
+            if (!selectedFruit) {
+                alert('Product code not found.');
+                return;
+            }
+
+            // Update item details display
+            const itemDetails = document.getElementById('itemDetails');
+            itemDetails.innerHTML = `
+                <p>Product Code: ${selectedFruit.code}</p>
+                <p>Product Name: ${selectedFruit.name}</p>
+                <p>Price: ₱${selectedFruit.price}</p>
+                <p>Quantity: ${itemQuantity}</p>
+                <p>Total for this item: ₱${(selectedFruit.price * itemQuantity).toFixed(2)}</p>
+            `;
+
+            totalAmount += selectedFruit.price * itemQuantity;
+            document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+
+            // Clear input fields
+            document.getElementById('productCode').value = '';
+            document.getElementById('itemQuantity').value = '';
+        }
+
+        function calculateChange() {
+            const paymentAmount = parseFloat(document.getElementById('paymentAmount').value);
+
+            if (isNaN(paymentAmount) || paymentAmount < 0) {
+                alert('Please enter a valid payment amount.');
+                return;
+            }
+
+            if (paymentAmount < totalAmount) {
+                alert('Payment amount is less than total amount.');
+                return;
+            }
+
+            const change = paymentAmount - totalAmount;
+            document.getElementById('changeAmount').textContent = change.toFixed(2);
+        }
+    </script>
+</body>
+</html>
